@@ -1,69 +1,17 @@
-// Estado da Aplicação
-let currentCategory = '';
+﻿import re
 
-// Elementos DOM
-const tabsContainer = document.getElementById('tabs-container');
-const catalogContainer = document.getElementById('catalog-container');
+with open('catalogo.js', 'r', encoding='utf-8') as f:
+    code = f.read()
 
-// Inicialização
-document.addEventListener('DOMContentLoaded', () => {
-    // catalogo é carregado do dados.js
-    if (typeof catalogo === 'undefined' || Object.keys(catalogo).length === 0) {
-        catalogContainer.innerHTML = '<p style="text-align:center;width:100%;padding:50px;">Nenhuma estampa encontrada. Execute o gerador_dados.py</p>';
-        return;
-    }
+def replace_between(text, start_str, end_str, replacement):
+    start = text.find(start_str)
+    if start == -1: return text
+    end = text.find(end_str, start)
+    if end == -1: return text
+    return text[:start] + replacement + text[end:]
 
-    const categories = Object.keys(catalogo);
-    currentCategory = categories[0];
-    
-    renderTabs(categories);
-    renderCatalog(currentCategory);
-});
-
-// Renderização das Abas
-function renderTabs(categories) {
-    tabsContainer.innerHTML = '';
-    categories.forEach(cat => {
-        const btn = document.createElement('button');
-        btn.className = `tab ${cat === currentCategory ? 'active' : ''}`;
-        btn.innerText = cat;
-        btn.onclick = () => {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            btn.classList.add('active');
-            currentCategory = cat;
-            renderCatalog(cat);
-        };
-        tabsContainer.appendChild(btn);
-    });
-}
-
-// Renderização do Catálogo
-function renderCatalog(category) {
-    catalogContainer.innerHTML = '';
-    const items = catalogo[category];
-    
-    items.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.onclick = () => openModal(item);
-        
-        card.innerHTML = `
-            <img src="${item.thumb || item.image}" alt="Estampa ${item.id}" loading="lazy">
-            <div class="codigo">${item.id}</div>
-        `;
-        catalogContainer.appendChild(card);
-    });
-}
-
-// Lógica do Modal de Produto (Modo Mostruário Estático)
-function openModal(item) {
-    const modal = document.getElementById('product-modal');
-    
-    // Configura Imagem ou Vídeo no Modal
-    const imgEl = document.getElementById('modal-image');
-    const videoEl = document.getElementById('modal-video');
-    
-    // Lógica das Variações (Videos/Strass Dinâmico)
+# 1. Add logic for Variations inside openModal
+variation_logic = '''    // Lógica das Variações (Videos/Strass Dinâmico)
     const variationContainer = document.getElementById('variation-selector-container');
     const variationOptions = document.getElementById('variation-options');
     
@@ -92,10 +40,10 @@ function openModal(item) {
             
             const isChecked = index === 0 ? 'checked' : '';
             
-            label.innerHTML = `
-                <input type="radio" name="variation-option" value="${vari.name}" ${isChecked}>
-                <span class="variant-btn">${vari.name}</span>
-            `;
+            label.innerHTML = 
+                <input type="radio" name="variation-option" value="" >
+                <span class="variant-btn"></span>
+            ;
             
             // Event listener para trocar video na hora
             label.querySelector('input').addEventListener('change', (e) => {
@@ -113,11 +61,27 @@ function openModal(item) {
         variationContainer.style.display = 'none';
         updateMedia(item.image);
     }
+'''
 
-    
-    document.getElementById('modal-title').innerText = item.id;
-    
-    // Exibir cores informativas
+old_media_logic = '''    if (item.image.toLowerCase().endsWith('.mp4')) {
+        imgEl.style.display = 'none';
+        videoEl.style.display = 'block';
+        videoEl.src = item.image;
+        videoEl.playbackRate = 2.5; // Mantém a aceleração do vídeo
+    } else {
+        videoEl.style.display = 'none';
+        videoEl.src = '';
+        imgEl.style.display = 'block';
+        imgEl.src = item.image;
+    }'''
+
+code = code.replace(old_media_logic, variation_logic)
+
+# 2. Add Colors logic for the new tabs
+color_logic_start = "    // Exibir cores informativas"
+color_logic_end = "    modal.style.display = 'flex';"
+
+new_color_logic = '''    // Exibir cores informativas
     const infoContainer = document.getElementById('info-cores-container');
     const infoInfantil = document.getElementById('info-cores-infantil');
     const infoSilkCamisa = document.getElementById('info-cores-silkscreen');
@@ -148,22 +112,9 @@ function openModal(item) {
     } else {
         infoContainer.style.display = 'none';
     }
-    modal.style.display = 'flex';
-}
+'''
 
-function closeModal() {
-    document.getElementById('product-modal').style.display = 'none';
-    
-    // Pausa e reseta o vídeo ao fechar o modal
-    const videoEl = document.getElementById('modal-video');
-    videoEl.pause();
-    videoEl.src = '';
-}
+code = replace_between(code, color_logic_start, color_logic_end, new_color_logic)
 
-// Fechar modal clicando fora
-window.onclick = function(event) {
-    const modal = document.getElementById('product-modal');
-    if (event.target === modal) {
-        closeModal();
-    }
-}
+with open('catalogo.js', 'w', encoding='utf-8') as f:
+    f.write(code)
