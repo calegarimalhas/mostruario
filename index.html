@@ -3,18 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo - Calegari Malhas</title>
-    <!-- Google Fonts -->
+    <title>Catálogo - Calegari Malhas (Mostruário Digital)</title>
+    <!-- Google Fonts Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <!-- Ícones -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=10">
 </head>
 <body>
     <header>
         <div class="header-content">
             <h1>Calegari Malhas <span style="font-size: 0.5em; font-weight: 400; opacity: 0.8;">(Mostruário Digital)</span></h1>
-            <!-- Ícone de carrinho foi removido para a versão estática -->
         </div>
         <nav id="tabs-container">
             <!-- As abas serão geradas via JS -->
@@ -25,59 +24,158 @@
         <!-- O grid de imagens será gerado via JS -->
     </main>
 
-    <!-- Modal do Produto -->
+    <!-- Modal do Produto (Mostruário Visual) -->
     <div id="product-modal" class="modal">
-        <div class="modal-content" style="max-width: 500px;"> <!-- Menor pois não tem os seletores -->
+        <div class="modal-content">
             <span class="close-btn" onclick="closeModal()">&times;</span>
-            <div class="modal-body" style="flex-direction: column;"> <!-- Para empilhar imagem e código -->
-                <div class="image-wrapper" style="width: 100%; border-right: none;">
-                    <img id="modal-image" src="" alt="Estampa" style="width: 100%;">
+            <div class="modal-body">
+                <div class="image-wrapper">
+                    <img id="modal-image" src="" alt="Estampa">
                     <video id="modal-video" src="" autoplay loop muted playsinline style="display: none; width: 100%; border-radius: 12px;"></video>
                 </div>
-                <div class="product-info" style="width: 100%; padding: 20px 0 0 0; text-align: center;">
-                    <h2 id="modal-title" style="font-size: 2em; margin: 0;">Código</h2>
-                    <p style="color: #666; margin-top: 10px; margin-bottom: 10px;">Anote este código e as especificações de cores/tamanhos para enviar seu pedido.</p>
+                <div class="product-info">
+                    <h2 id="modal-title">Código</h2>
                     
-                    <!-- Informação visual de cores disponíveis (Estático e sem seleção) -->
-                    <div id="info-cores-container" style="display: none; justify-content: center; align-items: flex-start; gap: 30px; flex-wrap: wrap; margin-top: 20px;">
-                        
-                        <div id="info-cores-infantil" style="display: none; flex-direction: column; align-items: center;">
-                            <span style="font-weight: 600; font-size: 0.9em; color: var(--text-light); margin-bottom: 8px;">Cores de Camisa Disponíveis:</span>
-                            <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
-                                <span class="color-btn" style="background: white; border-color: #ddd; padding: 4px 10px; font-size: 0.8em; cursor: default;">Branco</span>
-                                <span class="color-btn" style="background: #40e0d0; color: white; border-color: transparent; padding: 4px 10px; font-size: 0.8em; cursor: default;">Azul Turquesa</span>
-                                <span class="color-btn" style="background: #ffb6c1; color: white; border-color: transparent; padding: 4px 10px; font-size: 0.8em; cursor: default;">Rosa Chiclete</span>
-                            </div>
+                    <!-- Seletor de Strass (Acabamento) -->
+                    <div id="strass-selector-container" class="variant-selector" style="display: none;">
+                        <h3>Acabamento:</h3>
+                        <div class="variant-options">
+                            <label class="variant-option">
+                                <input type="radio" name="strass-option" value="Com Pedrinha" checked>
+                                <span class="variant-btn">
+                                    <img src="strass.png" alt="Strass" class="strass-icon" onerror="this.style.display='none'">
+                                    Com Pedrinha
+                                </span>
+                            </label>
+                            <label class="variant-option">
+                                <input type="radio" name="strass-option" value="Sem Pedrinha">
+                                <span class="variant-btn">Sem Pedrinha</span>
+                            </label>
                         </div>
-
-                        <div id="info-cores-silkscreen" style="display: none; flex-direction: column; align-items: center;">
-                            <span style="font-weight: 600; font-size: 0.9em; color: var(--text-light); margin-bottom: 8px;">Cores de Camisa Disponíveis:</span>
-                            <div style="display: flex; gap: 8px;">
-                                <span class="color-square" style="background: black; width: 25px; height: 25px; cursor: default;" title="Preta"></span>
-                                <span class="color-square" style="background: #e30000; width: 25px; height: 25px; cursor: default;" title="Vermelha"></span>
-                                <span class="color-square" style="background: #2b53a3; width: 25px; height: 25px; cursor: default;" title="Azul Royal"></span>
-                                <span class="color-square" style="background: #000080; width: 25px; height: 25px; cursor: default;" title="Azul Marinho"></span>
-                            </div>
-                        </div>
-
-                        <div id="info-estampa-silkscreen" style="display: none; flex-direction: column; align-items: center;">
-                            <span style="font-weight: 600; font-size: 0.9em; color: var(--text-light); margin-bottom: 8px;">Cores de Estampa Disponíveis:</span>
-                            <div style="display: flex; gap: 10px;">
-                                <img src="tintabranca.png" style="width: 30px; height: 30px; border-radius: 50%; object-fit: contain; border: 1px solid #ddd;" title="Branca">
-                                <img src="tintadourada.png" style="width: 30px; height: 30px; border-radius: 50%; object-fit: contain; border: 1px solid #ddd;" title="Dourada">
-                                <img src="tintaprata.png" style="width: 30px; height: 30px; border-radius: 50%; object-fit: contain; border: 1px solid #ddd;" title="Prata">
-                            </div>
-                        </div>
-                        
                     </div>
+                    
+                    <!-- Seletor de Variação (Estampas/Vídeos) -->
+                    <div id="variation-selector-container" class="variant-selector" style="display: none;">
+                        <h3>Variação:</h3>
+                        <div id="variation-options" class="variant-options">
+                            <!-- Injetado via JS -->
+                        </div>
+                    </div>
+                    
+                    <!-- Seletor de Cores da Camisa -->
+                    <div id="color-selector-container" class="variant-selector" style="display: none;">
+                        <h3>Cor da Camisa:</h3>
+                        
+                        <!-- Cores Sublimação Infantil -->
+                        <div id="color-options-infantil" class="color-options" style="display: none;">
+                            <label class="color-option">
+                                <input type="radio" name="color-option" value="Branco" checked>
+                                <span class="color-btn" style="background: white; border-color: #ddd;">Branco</span>
+                            </label>
+                            <label class="color-option">
+                                <input type="radio" name="color-option" value="Azul Turquesa">
+                                <span class="color-btn" style="background: #40e0d0; color: white;">Azul Turquesa</span>
+                            </label>
+                            <label class="color-option">
+                                <input type="radio" name="color-option" value="Rosa Chiclete">
+                                <span class="color-btn" style="background: #ffb6c1; color: white;">Rosa Chiclete</span>
+                            </label>
+                        </div>
+                        
+                        <!-- Cores Viscolycra Infantil Selo -->
+                        <div id="color-options-infantil-selo" class="color-options" style="display: none;">
+                            <label class="color-option">
+                                <input type="radio" name="color-option" value="Preta" checked>
+                                <span class="color-btn" style="background: black; color: white;">Preta</span>
+                            </label>
+                            <label class="color-option">
+                                <input type="radio" name="color-option" value="Rosa">
+                                <span class="color-btn" style="background: #ffc0cb; color: black;">Rosa</span>
+                            </label>
+                            <label class="color-option">
+                                <input type="radio" name="color-option" value="Marinho">
+                                <span class="color-btn" style="background: #000080; color: white;">Marinho</span>
+                            </label>
+                            <label class="color-option">
+                                <input type="radio" name="color-option" value="Vinho">
+                                <span class="color-btn" style="background: #722f37; color: white;">Vinho</span>
+                            </label>
+                        </div>
+                        
+                        <!-- Cores Baby Look Selo -->
+                        <div id="color-options-babylook-selo" class="color-options" style="display: none;">
+                            <label class="color-option">
+                                <input type="radio" name="color-option" value="Preta" checked>
+                                <span class="color-btn" style="background: black; color: white;">Preta</span>
+                            </label>
+                            <label class="color-option">
+                                <input type="radio" name="color-option" value="Branca">
+                                <span class="color-btn" style="background: white; border-color: #ddd;">Branca</span>
+                            </label>
+                            <label class="color-option">
+                                <input type="radio" name="color-option" value="Mescla">
+                                <span class="color-btn" style="background: #a9a9a9; color: white;">Mescla</span>
+                            </label>
+                            <label class="color-option">
+                                <input type="radio" name="color-option" value="Marinho">
+                                <span class="color-btn" style="background: #000080; color: white;">Marinho</span>
+                            </label>
+                            <label class="color-option">
+                                <input type="radio" name="color-option" value="Pink">
+                                <span class="color-btn" style="background: #ff1493; color: white;">Pink</span>
+                            </label>
+                            <label class="color-option">
+                                <input type="radio" name="color-option" value="Vinho">
+                                <span class="color-btn" style="background: #722f37; color: white;">Vinho</span>
+                            </label>
+                        </div>
+                        
+                        <!-- Cores Silkscreen (Quadrados) -->
+                        <div id="color-options-silkscreen" class="color-options" style="display: none;">
+                            <label class="color-option">
+                                <input type="radio" name="color-option-silk" value="Preta" checked>
+                                <span class="color-square" style="background: black;" title="Preta"></span>
+                            </label>
+                            <label class="color-option">
+                                <input type="radio" name="color-option-silk" value="Vermelha">
+                                <span class="color-square" style="background: #e30000;" title="Vermelha"></span>
+                            </label>
+                            <label class="color-option">
+                                <input type="radio" name="color-option-silk" value="Azul Royal">
+                                <span class="color-square" style="background: #2b53a3;" title="Azul Royal"></span>
+                            </label>
+                            <label class="color-option">
+                                <input type="radio" name="color-option-silk" value="Azul Marinho">
+                                <span class="color-square" style="background: #000080;" title="Azul Marinho"></span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Seletor de Cor da Estampa (Silkscreen) -->
+                    <div id="print-color-selector-container" class="variant-selector" style="display: none;">
+                        <h3>Cor da Estampa:</h3>
+                        <div class="print-color-options">
+                            <label class="print-color-option">
+                                <input type="radio" name="print-color-option" value="Branca" checked>
+                                <img src="tintabranca.png" alt="Branca" class="print-color-img">
+                            </label>
+                            <label class="print-color-option">
+                                <input type="radio" name="print-color-option" value="Dourada">
+                                <img src="tintadourada.png" alt="Dourada" class="print-color-img">
+                            </label>
+                            <label class="print-color-option">
+                                <input type="radio" name="print-color-option" value="Prata">
+                                <img src="tintaprata.png" alt="Prata" class="print-color-img">
+                            </label>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Carrinho e botões de checkout foram removidos para a versão estática -->
-
-    <script src="dados.js"></script>
-    <script src="catalogo.js"></script>
+    <script src="dados.js?v=10"></script>
+    <script src="catalogo.js?v=10"></script>
 </body>
 </html>

@@ -1,5 +1,11 @@
 // Estado da Aplicação
 let currentCategory = '';
+let currentProduct = null;
+
+// Configurações de Variantes (Strass)
+const strassCategories = ['Infantil', 'Baby Look', 'estampas/Infantil', 'estampas/Baby Look'];
+const noStrassItems = ['FTI-002', 'FTI-004', 'FTI-009', 'FTI-015'];
+const sublimacaoInfantilStrassIds = ['0001', '0002', '0003', '0004', '0005', '0006', '0008', '0009', '0010', '0012', '0013', '0014', '0015', '0016', '0017', '0018', '0020', '0024', '0029', '0034', '0035', '0036'];
 
 // Elementos DOM
 const tabsContainer = document.getElementById('tabs-container');
@@ -42,77 +48,180 @@ function renderCatalog(category) {
     catalogContainer.innerHTML = '';
     const items = catalogo[category];
     
-    items.forEach(item => {
+    if (!items || items.length === 0) {
+        catalogContainer.innerHTML = '<p style="text-align:center;width:100%;padding:50px;">Nenhuma estampa nesta categoria.</p>';
+        return;
+    }
+    
+    items.forEach((item, index) => {
         const card = document.createElement('div');
         card.className = 'card';
         card.onclick = () => openModal(item);
         
+        let loadingAttr = index < 4 ? 'fetchpriority="high"' : 'loading="lazy" decoding="async"';
         card.innerHTML = `
-            <img src="${item.thumb || item.image}" alt="Estampa ${item.id}" loading="lazy">
+            <img src="${item.thumb || item.image}" alt="Estampa ${item.id}" ${loadingAttr}>
             <div class="codigo">${item.id}</div>
         `;
         catalogContainer.appendChild(card);
     });
 }
 
-// Lógica do Modal de Produto (Modo Mostruário Estático)
+// Lógica do Modal de Produto (Modo Mostruário Visual)
 function openModal(item) {
+    currentProduct = item;
     const modal = document.getElementById('product-modal');
     
-    // Configura Imagem ou Vídeo no Modal
     const imgEl = document.getElementById('modal-image');
     const videoEl = document.getElementById('modal-video');
+    const variationContainer = document.getElementById('variation-selector-container');
+    const variationOptions = document.getElementById('variation-options');
     
-    if (item.image.toLowerCase().endsWith('.mp4')) {
-        imgEl.style.display = 'none';
-        videoEl.style.display = 'block';
-        videoEl.src = item.image;
-        videoEl.playbackRate = 2.5; // Mantém a aceleração do vídeo
+    // Função para atualizar mídia no visualizador
+    function updateMedia(mediaUrl) {
+        if (mediaUrl.toLowerCase().endsWith('.mp4')) {
+            imgEl.style.display = 'none';
+            videoEl.style.display = 'block';
+            videoEl.src = mediaUrl;
+            videoEl.playbackRate = 2.5; // Mantém aceleração padrão
+        } else {
+            videoEl.style.display = 'none';
+            videoEl.src = '';
+            imgEl.style.display = 'block';
+            imgEl.src = mediaUrl;
+        }
+    }
+    
+    // Lógica das Variações (Baby Look Selo, Viscolycra Infantil Selo, etc.)
+    if (item.variations && item.variations.length > 1) {
+        variationContainer.style.display = 'block';
+        variationOptions.innerHTML = '';
+        
+        item.variations.forEach((vari, index) => {
+            const label = document.createElement('label');
+            label.className = 'variant-option';
+            const isChecked = index === 0 ? 'checked' : '';
+            
+            label.innerHTML = `
+                <input type="radio" name="variation-option" value="${vari.name}" ${isChecked}>
+                <span class="variant-btn">${vari.name}</span>
+            `;
+            
+            label.querySelector('input').addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    updateMedia(vari.image);
+                }
+            });
+            
+            variationOptions.appendChild(label);
+        });
+        
+        updateMedia(item.variations[0].image);
     } else {
-        videoEl.style.display = 'none';
-        videoEl.src = '';
-        imgEl.style.display = 'block';
-        imgEl.src = item.image;
+        variationContainer.style.display = 'none';
+        updateMedia(item.image);
     }
     
     document.getElementById('modal-title').innerText = item.id;
     
-    // Exibir cores informativas
-    const infoContainer = document.getElementById('info-cores-container');
-    const infoInfantil = document.getElementById('info-cores-infantil');
-    const infoSilkCamisa = document.getElementById('info-cores-silkscreen');
-    const infoSilkEstampa = document.getElementById('info-estampa-silkscreen');
+    // Lógica do Strass (Pedrinha)
+    const strassContainer = document.getElementById('strass-selector-container');
+    let hasStrass = false;
     
-    if (currentCategory === 'Sublimação Infantil') {
-        infoContainer.style.display = 'flex';
-        infoInfantil.style.display = 'flex';
-        infoSilkCamisa.style.display = 'none';
-        infoSilkEstampa.style.display = 'none';
-    } else if (currentCategory === 'Silkscreen') {
-        infoContainer.style.display = 'flex';
-        infoInfantil.style.display = 'none';
-        infoSilkCamisa.style.display = 'flex';
-        infoSilkEstampa.style.display = 'flex';
+    if (strassCategories.some(c => currentCategory.includes(c)) && !currentCategory.includes('Selo') && !noStrassItems.includes(item.id)) {
+        hasStrass = true;
+    } else if ((currentCategory === 'Sublimação Infantil' || currentCategory === 'Sublimação Infantil') && sublimacaoInfantilStrassIds.includes(item.id)) {
+        hasStrass = true;
+    }
+    
+    if (hasStrass) {
+        strassContainer.style.display = 'block';
+        const strassRadio = document.querySelector('input[name="strass-option"][value="Com Pedrinha"]');
+        if (strassRadio) strassRadio.checked = true;
     } else {
-        infoContainer.style.display = 'none';
+        strassContainer.style.display = 'none';
+    }
+    
+    // Lógica de Cores da Camisa
+    const colorContainer = document.getElementById('color-selector-container');
+    const colorInfantil = document.getElementById('color-options-infantil');
+    const colorSilkscreen = document.getElementById('color-options-silkscreen');
+    const colorInfantilSelo = document.getElementById('color-options-infantil-selo');
+    const colorBabylookSelo = document.getElementById('color-options-babylook-selo');
+    
+    if (colorInfantil) colorInfantil.style.display = 'none';
+    if (colorSilkscreen) colorSilkscreen.style.display = 'none';
+    if (colorInfantilSelo) colorInfantilSelo.style.display = 'none';
+    if (colorBabylookSelo) colorBabylookSelo.style.display = 'none';
+    
+    if (currentCategory === 'Sublimação Infantil' || currentCategory === 'Sublimação Infantil') {
+        colorContainer.style.display = 'block';
+        if (colorInfantil) colorInfantil.style.display = 'flex';
+        const radio = document.querySelector('#color-options-infantil input[name="color-option"][value="Branco"]');
+        if (radio) radio.checked = true;
+    } else if (currentCategory === 'Silkscreen') {
+        colorContainer.style.display = 'block';
+        if (colorSilkscreen) colorSilkscreen.style.display = 'flex';
+        const radio = document.querySelector('input[name="color-option-silk"][value="Preta"]');
+        if (radio) radio.checked = true;
+    } else if (currentCategory === 'Viscolycra Infantil Selo') {
+        colorContainer.style.display = 'block';
+        if (colorInfantilSelo) colorInfantilSelo.style.display = 'flex';
+        const radio = document.querySelector('#color-options-infantil-selo input[name="color-option"][value="Preta"]');
+        if (radio) radio.checked = true;
+    } else if (currentCategory === 'Baby Look Selo') {
+        colorContainer.style.display = 'block';
+        if (colorBabylookSelo) colorBabylookSelo.style.display = 'flex';
+        const radio = document.querySelector('#color-options-babylook-selo input[name="color-option"][value="Preta"]');
+        if (radio) radio.checked = true;
+    } else {
+        colorContainer.style.display = 'none';
+    }
+    
+    // Lógica da Cor da Estampa (Silkscreen)
+    const printColorContainer = document.getElementById('print-color-selector-container');
+    if (currentCategory === 'Silkscreen') {
+        printColorContainer.style.display = 'block';
+        const radio = document.querySelector('input[name="print-color-option"][value="Branca"]');
+        if (radio) radio.checked = true;
+    } else {
+        printColorContainer.style.display = 'none';
     }
     
     modal.style.display = 'flex';
+    history.pushState({ type: 'modal' }, '', '#produto');
 }
 
-function closeModal() {
-    document.getElementById('product-modal').style.display = 'none';
-    
-    // Pausa e reseta o vídeo ao fechar o modal
-    const videoEl = document.getElementById('modal-video');
-    videoEl.pause();
-    videoEl.src = '';
+function closeModal(isPopState = false) {
+    const modal = document.getElementById('product-modal');
+    if (modal && modal.style.display !== 'none') {
+        modal.style.display = 'none';
+        currentProduct = null;
+        
+        const videoEl = document.getElementById('modal-video');
+        if (videoEl) {
+            videoEl.pause();
+            videoEl.src = '';
+        }
+        
+        if (!isPopState && window.location.hash === '#produto') {
+            history.back();
+        }
+    }
 }
 
-// Fechar modal clicando fora
+// Suporte para fechar pelo botão voltar do celular (Navegação Nativa)
+window.addEventListener('popstate', function(event) {
+    const modal = document.getElementById('product-modal');
+    if (modal && modal.style.display !== 'none') {
+        closeModal(true);
+    }
+});
+
+// Fechar modal ao clicar na área externa
 window.onclick = function(event) {
     const modal = document.getElementById('product-modal');
     if (event.target === modal) {
         closeModal();
     }
-}
+};
