@@ -1,11 +1,44 @@
 // Estado da Aplicação
 let currentCategory = '';
+let currentSubFilter = 'Todos';
 let currentProduct = null;
 
 // Configurações de Variantes (Strass)
 const strassCategories = ['Infantil', 'Baby Look', 'estampas/Infantil', 'estampas/Baby Look'];
 const noStrassItems = ['FTI-002', 'FTI-004', 'FTI-009', 'FTI-015'];
 const sublimacaoInfantilStrassIds = ['0001', '0002', '0003', '0004', '0005', '0006', '0008', '0009', '0010', '0012', '0013', '0014', '0015', '0016', '0017', '0018', '0020', '0024', '0029', '0034', '0035', '0036'];
+
+// Dicionário de Filtros por Categoria/Tema
+const FILTROS_CATEGORIAS = {
+    "Baby Look": {
+        "Nossa Senhora Aparecida": ["BBLK001", "BBLK002", "BBLK003", "BBLK004", "BBLK005", "BBLK008", "BBLK009", "BBLK010", "BBLK011", "BBLK012", "BBLK013", "BBLK014", "BBLK015", "BBLK016", "BBLK017", "BBLK018", "BBLK020", "BBLK021", "BBLK022", "BBLK023", "BBLK024", "BBLK025", "BBLK026", "BBLK027", "BBLK028", "BBLK040", "BBLK043", "BBLK044", "BBLK045", "BBLK046"],
+        "São Miguel": ["BBLK007", "BBLK029"],
+        "Nossa Senhora das Graças": ["BBLK019", "BBLK035", "BBLK037"],
+        "Nossa Senhora de Fátima": ["BBLK006", "BBLK030", "BBLK032", "BBLK038"],
+        "São Bento": ["BBLK031", "BBLK036"],
+        "Nossa Senhora de Guadalupe": ["BBLK033", "BBLK039"],
+        "Sagrada Família": ["BBLK034"],
+        "Santíssimo": ["BBLK042"],
+        "São José": ["BBLK041"]
+    },
+    "Body": {
+        "Nossa Senhora Aparecida": ["0002", "0003", "0005", "0006", "0007", "0020", "0021", "0023", "0024", "0029", "0031", "0032", "0033"],
+        "Anjinhos": ["0001", "0004", "0008", "0009", "0018", "0019", "0022", "0025", "0026", "0027", "0028", "0030"],
+        "Futebol": ["0037", "0038", "0039", "0040", "0041", "0042", "0043", "0044", "0045", "0046", "0047", "0048"],
+        "Desenhos": ["0034", "0035", "0036"],
+        "Fé": ["0010", "0011", "0012", "0013", "0014", "0015", "0016", "0017"]
+    },
+    "Frente Total": {
+        "Nossa Senhora Aparecida": ["FT001", "FT002", "FT003", "FT004", "FT005", "FT010", "FT034", "FT037", "FT038", "FT043", "FT044", "FT045", "FT046", "FT061", "FT071", "FT073", "FT075", "FT076", "FT077", "FT078"],
+        "Nossa Senhora de Fátima": ["FT006", "FT021", "FT022", "FT023", "FT024", "FT067"],
+        "São Bento": ["FT007", "FT011", "FT012", "FT049", "FT057"],
+        "Cristo": ["FT008", "FT009", "FT013", "FT014", "FT015", "FT026", "FT027", "FT040", "FT041", "FT051"],
+        "Nossa Senhora das Graças": ["FT029", "FT048", "FT059", "FT068", "FT069", "FT070"],
+        "São Miguel": ["FT031", "FT032", "FT042"],
+        "São Jorge": ["FT025", "FT035", "FT036", "FT056"],
+        "Outros": ["FT016", "FT017", "FT018", "FT019", "FT020", "FT028", "FT030", "FT033", "FT039", "FT047", "FT050", "FT052", "FT053", "FT054", "FT055", "FT058", "FT060", "FT062", "FT063", "FT064", "FT065", "FT066", "FT072", "FT074"]
+    }
+};
 
 // Elementos DOM
 const tabsContainer = document.getElementById('tabs-container');
@@ -21,10 +54,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const categories = Object.keys(catalogo);
     currentCategory = categories[0];
+    currentSubFilter = 'Todos';
     
     renderTabs(categories);
+    renderSubFilters(currentCategory);
     renderCatalog(currentCategory);
 });
+
+// Renderização dos Sub-filtros por Tema
+function renderSubFilters(category) {
+    const container = document.getElementById('subfilters-container');
+    const list = document.getElementById('subfilters-list');
+    
+    if (!container || !list) return;
+    
+    const categoryFilters = FILTROS_CATEGORIAS[category];
+    
+    if (!categoryFilters || Object.keys(categoryFilters).length === 0) {
+        container.style.display = 'none';
+        list.innerHTML = '';
+        currentSubFilter = 'Todos';
+        return;
+    }
+    
+    container.style.display = 'block';
+    list.innerHTML = '';
+    
+    // Botão "Todos"
+    const allBtn = document.createElement('button');
+    allBtn.className = `subfilter-btn ${currentSubFilter === 'Todos' ? 'active' : ''}`;
+    allBtn.innerText = 'Todos';
+    allBtn.onclick = () => {
+        currentSubFilter = 'Todos';
+        renderSubFilters(category);
+        renderCatalog(category);
+    };
+    list.appendChild(allBtn);
+    
+    // Botões dos Temas
+    for (const themeName of Object.keys(categoryFilters)) {
+        const btn = document.createElement('button');
+        btn.className = `subfilter-btn ${currentSubFilter === themeName ? 'active' : ''}`;
+        btn.innerText = themeName;
+        btn.onclick = () => {
+            currentSubFilter = themeName;
+            renderSubFilters(category);
+            renderCatalog(category);
+        };
+        list.appendChild(btn);
+    }
+}
 
 // Renderização das Abas
 function renderTabs(categories) {
@@ -37,6 +116,8 @@ function renderTabs(categories) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             btn.classList.add('active');
             currentCategory = cat;
+            currentSubFilter = 'Todos';
+            renderSubFilters(cat);
             renderCatalog(cat);
         };
         tabsContainer.appendChild(btn);
@@ -46,7 +127,12 @@ function renderTabs(categories) {
 // Renderização do Catálogo
 function renderCatalog(category) {
     catalogContainer.innerHTML = '';
-    const items = catalogo[category];
+    let items = catalogo[category] || [];
+    
+    if (currentSubFilter && currentSubFilter !== 'Todos' && FILTROS_CATEGORIAS[category] && FILTROS_CATEGORIAS[category][currentSubFilter]) {
+        const allowedIds = FILTROS_CATEGORIAS[category][currentSubFilter];
+        items = items.filter(item => allowedIds.includes(item.id));
+    }
     
     if (!items || items.length === 0) {
         catalogContainer.innerHTML = '<p style="text-align:center;width:100%;padding:50px;">Nenhuma estampa nesta categoria.</p>';
@@ -124,9 +210,9 @@ function openModal(item) {
     
     document.getElementById('modal-title').innerText = item.id;
     
-    // Descrição Especial (Frente Total Masculina)
+    // Descrição Especial (Frente Total)
     const descContainer = document.getElementById('modal-description');
-    if (currentCategory === 'Frente Total Masculina') {
+    if (currentCategory.includes('Frente Total')) {
         if (descContainer) {
             descContainer.style.display = 'block';
             descContainer.innerText = 'Tamanhos: P ao GG | Manga e costas brancas';
@@ -200,7 +286,7 @@ function openModal(item) {
     if (colorBabylookSelo) colorBabylookSelo.style.display = 'none';
     if (colorBody) colorBody.style.display = 'none';
     
-    if (currentCategory === 'Body Infantil' || currentCategory === 'estampasbody') {
+    if (currentCategory === 'Body' || currentCategory === 'Body Infantil' || currentCategory === 'estampasbody') {
         colorContainer.style.display = 'block';
         if (colorTitle) colorTitle.innerText = 'Cor do Viés (Gola/Manga):';
         if (colorBody) colorBody.style.display = 'flex';
@@ -208,7 +294,7 @@ function openModal(item) {
         if (radio) radio.checked = true;
     } else {
         if (colorTitle) colorTitle.innerText = 'Cor da Camisa:';
-        if (currentCategory === 'Sublimação Adulta Branca' || currentCategory.includes('Sublimação Adulta')) {
+        if (currentCategory.includes('Sublimação Adulta')) {
             colorContainer.style.display = 'block';
             if (colorAdulto) colorAdulto.style.display = 'flex';
             const radio = document.querySelector('input[name="color-option-adulto"][value="Branca"]');
