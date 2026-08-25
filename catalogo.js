@@ -124,11 +124,22 @@ function openModal(item) {
     
     document.getElementById('modal-title').innerText = item.id;
     
+    // Descrição Especial (Frente Total Masculina)
+    const descContainer = document.getElementById('modal-description');
+    if (currentCategory === 'Frente Total Masculina') {
+        if (descContainer) {
+            descContainer.style.display = 'block';
+            descContainer.innerText = 'Tamanhos: P ao GG | Manga e costas brancas';
+        }
+    } else {
+        if (descContainer) descContainer.style.display = 'none';
+    }
+
     // Lógica do Strass (Pedrinha)
     const strassContainer = document.getElementById('strass-selector-container');
     let hasStrass = false;
     
-    if (!currentCategory.includes('Body') && strassCategories.some(c => currentCategory.includes(c)) && !currentCategory.includes('Selo') && !noStrassItems.includes(item.id)) {
+    if (!currentCategory.includes('Body') && !currentCategory.includes('Frente Total') && strassCategories.some(c => currentCategory.includes(c)) && !currentCategory.includes('Selo') && !noStrassItems.includes(item.id)) {
         hasStrass = true;
     } else if ((currentCategory === 'Sublimação Infantil' || currentCategory === 'Sublimação Infantil') && sublimacaoInfantilStrassIds.includes(item.id)) {
         hasStrass = true;
