@@ -142,15 +142,47 @@ function openModal(item) {
         strassContainer.style.display = 'none';
     }
     
+    // Lógica de Tecido / Modelo (Baby Look Selo)
+    const fabricContainer = document.getElementById('fabric-selector-container');
+    if (currentCategory === 'Baby Look Selo') {
+        if (fabricContainer) {
+            fabricContainer.style.display = 'block';
+            const defaultFabric = document.querySelector('input[name="fabric-option"][value="Baby Visco"]');
+            if (defaultFabric) defaultFabric.checked = true;
+            
+            const fabricRadios = document.querySelectorAll('input[name="fabric-option"]');
+            fabricRadios.forEach(radio => {
+                radio.onchange = (e) => {
+                    const isPolyester = e.target.value === 'Baby Poliéster';
+                    const viscoOnlyOptions = document.querySelectorAll('.color-opt-baby-visco-only');
+                    viscoOnlyOptions.forEach(opt => {
+                        opt.style.display = isPolyester ? 'none' : 'inline-block';
+                    });
+                    if (isPolyester) {
+                        const checkedColor = document.querySelector('input[name="color-option-babylook-selo"]:checked');
+                        if (checkedColor && (checkedColor.value === 'Pink' || checkedColor.value === 'Vinho')) {
+                            const defaultColor = document.querySelector('input[name="color-option-babylook-selo"][value="Marinho"]');
+                            if (defaultColor) defaultColor.checked = true;
+                        }
+                    }
+                };
+            });
+        }
+    } else {
+        if (fabricContainer) fabricContainer.style.display = 'none';
+    }
+
     // Lógica de Cores da Camisa / Viés
     const colorContainer = document.getElementById('color-selector-container');
     const colorTitle = colorContainer ? colorContainer.querySelector('h3') : null;
+    const colorAdulto = document.getElementById('color-options-adulto');
     const colorInfantil = document.getElementById('color-options-infantil');
     const colorSilkscreen = document.getElementById('color-options-silkscreen');
     const colorInfantilSelo = document.getElementById('color-options-infantil-selo');
     const colorBabylookSelo = document.getElementById('color-options-babylook-selo');
     const colorBody = document.getElementById('color-options-body');
     
+    if (colorAdulto) colorAdulto.style.display = 'none';
     if (colorInfantil) colorInfantil.style.display = 'none';
     if (colorSilkscreen) colorSilkscreen.style.display = 'none';
     if (colorInfantilSelo) colorInfantilSelo.style.display = 'none';
@@ -165,10 +197,15 @@ function openModal(item) {
         if (radio) radio.checked = true;
     } else {
         if (colorTitle) colorTitle.innerText = 'Cor da Camisa:';
-        if (currentCategory === 'Sublimação Infantil' || currentCategory === 'Sublimação Infantil') {
+        if (currentCategory === 'Sublimação Adulta Branca' || currentCategory.includes('Sublimação Adulta')) {
+            colorContainer.style.display = 'block';
+            if (colorAdulto) colorAdulto.style.display = 'flex';
+            const radio = document.querySelector('input[name="color-option-adulto"][value="Branca"]');
+            if (radio) radio.checked = true;
+        } else if (currentCategory === 'Sublimação Infantil' || currentCategory === 'Sublimação Infantil') {
             colorContainer.style.display = 'block';
             if (colorInfantil) colorInfantil.style.display = 'flex';
-            const radio = document.querySelector('#color-options-infantil input[name="color-option"][value="Branco"]');
+            const radio = document.querySelector('input[name="color-option-infantil"][value="Branco"]');
             if (radio) radio.checked = true;
         } else if (currentCategory === 'Silkscreen') {
             colorContainer.style.display = 'block';
@@ -183,7 +220,9 @@ function openModal(item) {
         } else if (currentCategory === 'Baby Look Selo') {
             colorContainer.style.display = 'block';
             if (colorBabylookSelo) colorBabylookSelo.style.display = 'flex';
-            const radio = document.querySelector('#color-options-babylook-selo input[name="color-option"][value="Preta"]');
+            const viscoOnlyOptions = document.querySelectorAll('.color-opt-baby-visco-only');
+            viscoOnlyOptions.forEach(opt => opt.style.display = 'inline-block');
+            const radio = document.querySelector('input[name="color-option-babylook-selo"][value="Preta"]');
             if (radio) radio.checked = true;
         } else {
             colorContainer.style.display = 'none';
