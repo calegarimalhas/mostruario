@@ -166,6 +166,7 @@ header h1 {
     aspect-ratio: 1 / 1;
     border-radius: 8px;
     object-fit: contain;
+    clip-path: inset(0 4px 0 0);
 }
 
 .card .codigo {
@@ -261,6 +262,7 @@ header h1 {
     max-height: 250px;
     width: auto;
     object-fit: contain;
+    clip-path: inset(0 4px 0 0);
 }
 
 .product-info {
