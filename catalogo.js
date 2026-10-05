@@ -364,6 +364,7 @@ function openModal(item) {
     const colorContainer = document.getElementById('color-selector-container');
     const colorTitle = colorContainer ? colorContainer.querySelector('h3') : null;
     const colorAdulto = document.getElementById('color-options-adulto');
+    const colorSublimacaoMachao = document.getElementById('color-options-sublimacao-machao');
     const colorInfantil = document.getElementById('color-options-infantil');
     const colorSilkscreenAdulto = document.getElementById('color-options-silkscreen-adulto');
     const colorSilkscreenBaby = document.getElementById('color-options-silkscreen-baby');
@@ -374,6 +375,36 @@ function openModal(item) {
     const colorDtfBabylook = document.getElementById('color-options-dtf-babylook');
     const colorDtfInfantilCamiseta = document.getElementById('color-options-dtf-infantil-camiseta');
     const colorDtfInfantilBaby = document.getElementById('color-options-dtf-infantil-baby');
+
+    // Lógica do Modelo de Camiseta (Sublimação Adulto)
+    const sublimacaoAdultoModelContainer = document.getElementById('sublimacao-adulto-model-selector-container');
+    if (currentCategory.includes('Sublimação Adulta')) {
+        if (sublimacaoAdultoModelContainer) {
+            sublimacaoAdultoModelContainer.style.display = 'block';
+            const defaultModel = document.querySelector('input[name="sublimacao-adulto-model-option"][value="Camiseta"]');
+            if (defaultModel) defaultModel.checked = true;
+
+            const sublimacaoModelRadios = document.querySelectorAll('input[name="sublimacao-adulto-model-option"]');
+            sublimacaoModelRadios.forEach(radio => {
+                radio.onchange = (e) => {
+                    const isMachao = e.target.value === 'Camiseta Machão';
+                    if (isMachao) {
+                        if (colorAdulto) colorAdulto.style.display = 'none';
+                        if (colorSublimacaoMachao) colorSublimacaoMachao.style.display = 'flex';
+                        const defaultRadio = document.querySelector('#color-options-sublimacao-machao input[name="color-option-sublimacao-machao"][value="Branca"]');
+                        if (defaultRadio) defaultRadio.checked = true;
+                    } else {
+                        if (colorSublimacaoMachao) colorSublimacaoMachao.style.display = 'none';
+                        if (colorAdulto) colorAdulto.style.display = 'flex';
+                        const defaultRadio = document.querySelector('#color-options-adulto input[name="color-option-adulto"][value="Branca"]');
+                        if (defaultRadio) defaultRadio.checked = true;
+                    }
+                };
+            });
+        }
+    } else {
+        if (sublimacaoAdultoModelContainer) sublimacaoAdultoModelContainer.style.display = 'none';
+    }
 
     // Lógica do Modelo de Camiseta (Silkscreen - Visual)
     const silkModelContainer = document.getElementById('silk-model-selector-container');
@@ -468,6 +499,7 @@ function openModal(item) {
     }
     
     if (colorAdulto) colorAdulto.style.display = 'none';
+    if (colorSublimacaoMachao) colorSublimacaoMachao.style.display = 'none';
     if (colorInfantil) colorInfantil.style.display = 'none';
     if (colorSilkscreenAdulto) colorSilkscreenAdulto.style.display = 'none';
     if (colorSilkscreenBaby) colorSilkscreenBaby.style.display = 'none';
@@ -490,9 +522,17 @@ function openModal(item) {
             if (colorTitle) colorTitle.innerText = 'Cor da Camisa:';
             if (currentCategory.includes('Sublimação Adulta')) {
                 colorContainer.style.display = 'block';
-                if (colorAdulto) colorAdulto.style.display = 'flex';
-                const radio = document.querySelector('input[name="color-option-adulto"][value="Branca"]');
-                if (radio) radio.checked = true;
+                const selectedSubModel = document.querySelector('input[name="sublimacao-adulto-model-option"]:checked');
+                const isMachao = selectedSubModel && selectedSubModel.value === 'Camiseta Machão';
+                if (isMachao) {
+                    if (colorSublimacaoMachao) colorSublimacaoMachao.style.display = 'flex';
+                    const radio = document.querySelector('input[name="color-option-sublimacao-machao"][value="Branca"]');
+                    if (radio) radio.checked = true;
+                } else {
+                    if (colorAdulto) colorAdulto.style.display = 'flex';
+                    const radio = document.querySelector('input[name="color-option-adulto"][value="Branca"]');
+                    if (radio) radio.checked = true;
+                }
             } else if (currentCategory === 'Sublimação Infantil' || currentCategory === 'Sublimação Infantil') {
                 colorContainer.style.display = 'block';
                 if (colorInfantil) colorInfantil.style.display = 'flex';
@@ -570,6 +610,11 @@ function openModal(item) {
     if (hasStrass && strassContainer) {
         const h3 = strassContainer.querySelector('h3');
         if (h3) h3.innerText = `${stepNum}. Escolha o Acabamento:`;
+        stepNum++;
+    }
+    if (currentCategory.includes('Sublimação Adulta') && sublimacaoAdultoModelContainer) {
+        const h3 = sublimacaoAdultoModelContainer.querySelector('h3');
+        if (h3) h3.innerText = `${stepNum}. Escolha o Modelo:`;
         stepNum++;
     }
     if (currentCategory === 'Baby Look Selo' && fabricContainer) {
