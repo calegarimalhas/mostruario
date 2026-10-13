@@ -1431,6 +1431,14 @@ const catalogo = {
             "thumb": "estampas/DTFinfantil/Nossa Senhora Aparecida/mockup_058.webp",
             "tema": "Nossa Senhora Aparecida",
             "variations": []
+        },
+        {
+            "id": "0059",
+            "image": "estampas/DTFinfantil/Caminho da fé/mockup_059.webp",
+            "image_baby": "estampas/DTFinfantil/Caminho da fé/mockup_059Baby.webp",
+            "thumb": "estampas/DTFinfantil/Caminho da fé/mockup_059.webp",
+            "tema": "Caminho da fé",
+            "variations": []
         }
     ],
     "Frente Total BabyLook": [
